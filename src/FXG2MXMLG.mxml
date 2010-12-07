@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="600" height="420" 
+			   xmlns:ns1="*" backgroundColor="#F3F3F3" viewSourceURL="srcview/index.html">
+
+	<fx:Script>
+		<![CDATA[
+			import flash.desktop.Clipboard;
+			import flash.desktop.ClipboardFormats;
+			
+			private var fxgString:String;
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{								
+				fxgString=ta1.text;
+					
+				ta1.text= convertFXGtoMXMLG(ta1.text);
+				
+				if(clipboardCB.selected) Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT, ta1.text);
+				
+			}
+			
+			private function convertFXGtoMXMLG(pFxg:String):String
+			{				
+				var text:String=pFxg;
+				
+				// Remove the xml file tag				
+				text=text.replace('<?xml version="1.0" encoding="utf-8" ?>', "");
+				
+				
+				// Remove the default FXG namespace
+				text=text.replace('xmlns="http://ns.adobe.com/fxg/2008"', "");
+				
+								
+				// Remove private tags
+				text=text.replace( /<Private\/>/g, "");
+				text=text.replace( /<Private.*<\/Private>/gs, "");			
+				
+				
+				// Add spark prefix to all elements
+				text=text.replace( /<\//g, "</s:");
+				text=text.replace( /<(?!\/s:)/g, "<s:");
+				
+				
+				// Remove empty Library tags
+				text=text.replace( /<s:Library\/>/g, "");				
+				
+
+				// Re-prefix Library and Dictionnary tags with "fx"
+				text=text.replace( /<s:Library>/g, "<fx:Library>");
+				text=text.replace( /<\/s:Library>/g, "</fx:Library>");
+				
+				text=text.replace( /<s:Definition/g, "<fx:Definition");
+				text=text.replace( /<\/s:Definition>/g, "</fx:Definition>");	
+				
+				
+				// Move the library tag out of the root tag				
+				var libraryString:String="";
+				var result:Array = text.match( /<fx:Library.*<\/fx:Library>/gs);
+				if(result!=null && result[0]!=null)
+				{
+					libraryString=result[0];
+					text=text.replace( /<fx:Library.*<\/fx:Library>/gs, "");
+					text=libraryString+text+"\n";
+				}
+				
+				
+				// Remove tool specific attributes
+				// Note: this avoids having to move xmlns declarations up to the root tag
+				// the downside is that we need to know which namespaces should be removed (this list is incomplete)
+				text=text.replace( /ai:\w+=\"[^\"]+\"/g, "");	
+				text=text.replace( /flm:\w+=\"[^\"]+\"/g, "");	
+				text=text.replace( /ATE:\w+=\"[^\"]+\"/g, "");	
+				text=text.replace( /pd:\w+=\"[^\"]+\"/g, "");					
+				text=text.replace( /d:\w+=\"[^\"]+\"/g, "");	
+				
+				
+				// Add an "fx" prefix to elements defined in the Library
+				var defResult:Array = text.match( /<fx:Definition\sname=\"\w+/g);
+				for ( var i:int=0; i < defResult.length ; i++)
+				{
+					var defline:String=defResult[i];
+					var defName:String=defline.split('"')[1];
+
+					var regxp:RegExp = new RegExp("s:"+defName, "gi");
+					text=text.replace(regxp, "fx:"+defName);
+				}
+				
+				return text;
+			}
+			
+			
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<mx:TextArea id="ta1" y="44" height="313"
+				 text="Paste your FXG content here"  left="10" right="10"/>
+	
+	<s:CheckBox x="377" y="374" label="Copy to Clipboard" selected="true" 
+				id="clipboardCB"/>
+	
+	<s:Button x="204" y="365" label="Convert to MXML Graphics" 
+			  click="button1_clickHandler(event)" height="38"/>
+	<s:Label x="10" y="10" text="FXG to MXML Graphics converter" fontSize="24" fontWeight="bold" fontFamily="Georgia" color="#565656"/>
+	
+</s:Application>
