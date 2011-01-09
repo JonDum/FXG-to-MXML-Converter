@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" width="600" height="420" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" 
 			   xmlns:ns1="*" backgroundColor="#F3F3F3" viewSourceURL="srcview/index.html">
-
+	
 	<fx:Script>
 		<![CDATA[
 			import flash.desktop.Clipboard;
 			import flash.desktop.ClipboardFormats;
+			
+			import spark.effects.Fade;
 			
 			private var fxgString:String;
 			
 			protected function button1_clickHandler(event:MouseEvent):void
 			{								
 				fxgString=ta1.text;
-					
+				
 				ta1.text= convertFXGtoMXMLG(ta1.text);
 				
 				if(clipboardCB.selected) Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT, ta1.text);
@@ -32,7 +34,7 @@
 				// Remove the default FXG namespace
 				text=text.replace('xmlns="http://ns.adobe.com/fxg/2008"', "");
 				
-								
+				
 				// Remove private tags
 				text=text.replace( /<Private\/>/g, "");
 				text=text.replace( /<Private.*<\/Private>/gs, "");			
@@ -46,7 +48,7 @@
 				// Remove empty Library tags
 				text=text.replace( /<s:Library\/>/g, "");				
 				
-
+				
 				// Re-prefix Library and Dictionnary tags with "fx"
 				text=text.replace( /<s:Library>/g, "<fx:Library>");
 				text=text.replace( /<\/s:Library>/g, "</fx:Library>");
@@ -73,8 +75,14 @@
 				text=text.replace( /flm:\w+=\"[^\"]+\"/g, "");	
 				text=text.replace( /ATE:\w+=\"[^\"]+\"/g, "");	
 				text=text.replace( /pd:\w+=\"[^\"]+\"/g, "");					
-				text=text.replace( /d:\w+=\"[^\"]+\"/g, "");	
+				text=text.replace( /d:\w+=\"[^\"]+\"/g, "");
 				
+				//cleanup redundant, default attributes
+				text=text.replace(/(?:alpha=\"1\")/g, ""); //remove all alpha="1"
+				text=text.replace(/(?:blendMode=\"normal\")/g, ""); //remove all blendMode="normal"
+				text=text.replace(/(?:winding=\"evenOdd\")/g, ""); //remove all winding="evenOdd"
+				text=text.replace(/(?:weight=\"1\")/g, ""); //remove all weight="1"
+				text=text.replace(/(?:caps=\"round\")/g, ""); //remove all caps="round"
 				
 				// Add an "fx" prefix to elements defined in the Library
 				var defResult:Array = text.match( /<fx:Definition\sname=\"\w+/g);
@@ -82,7 +90,7 @@
 				{
 					var defline:String=defResult[i];
 					var defName:String=defline.split('"')[1];
-
+					
 					var regxp:RegExp = new RegExp("s:"+defName, "gi");
 					text=text.replace(regxp, "fx:"+defName);
 				}
@@ -93,19 +101,36 @@
 			
 		]]>
 	</fx:Script>
-
+	
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	
-	<mx:TextArea id="ta1" y="44" height="313"
-				 text="Paste your FXG content here"  left="10" right="10"/>
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center"
+						  paddingLeft="100" paddingRight="100" paddingBottom="100"
+						  paddingTop="50"/>
+	</s:layout>
 	
-	<s:CheckBox x="377" y="374" label="Copy to Clipboard" selected="true" 
+	<s:Label x="10" y="10" text="FXG to MXML Graphics converter" fontSize="24" fontWeight="bold" fontFamily="Georgia" color="#565656"/>
+	
+	<s:RichEditableText 
+		id="ta1"
+		width="100%" height="100%"
+		paddingLeft="5" paddingRight="5" paddingBottom="5" paddingTop="5"
+		text="Paste your FXG content here"
+		backgroundColor="0xffffff" focusThickness="1"
+		focusIn="{dsf.color = 0x70B2EE; dsf.alpha = 1;}" focusOut="{dsf.color = 0; dsf.alpha = 0.3}">
+		<s:filters>
+			<s:DropShadowFilter id="dsf" alpha="0.3" blurX="5" blurY="5" quality="3" distance="1" angle="90"/>
+		</s:filters>
+	</s:RichEditableText>
+	
+	<s:CheckBox label="Copy to Clipboard" selected="true" 
 				id="clipboardCB"/>
 	
 	<s:Button x="204" y="365" label="Convert to MXML Graphics" 
 			  click="button1_clickHandler(event)" height="38"/>
-	<s:Label x="10" y="10" text="FXG to MXML Graphics converter" fontSize="24" fontWeight="bold" fontFamily="Georgia" color="#565656"/>
+	
 	
 </s:Application>
