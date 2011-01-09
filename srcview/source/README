@@ -1,0 +1,7 @@
+
+Future improvements:
+
+Round things like 'alpha="0.50119471945"' to 'alpha="0.5" or round the numbers in a Path's data to whole numbers.
+
+
+
