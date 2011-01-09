@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<index>
+	<title>Source of FXG-to-MXML-Converter</title>
+	<nodes>
+		<node label="html-template">
+			<node label="history">
+				<node icon="cssIcon" label="history.css" url="source/html-template/history/history.css.html"/>
+				<node label="history.js" url="source/html-template/history/history.js.txt"/>
+				<node icon="htmlIcon" label="historyFrame.html" url="source/html-template/history/historyFrame.html"/>
+			</node>
+			<node icon="htmlIcon" label="index.template.html" url="source/html-template/index.template.html"/>
+			<node icon="swfIcon" label="playerProductInstall.swf" url="source/html-template/playerProductInstall.swf"/>
+			<node label="swfobject.js" url="source/html-template/swfobject.js.txt"/>
+		</node>
+		<node label="libs">
+		</node>
+		<node label="src">
+			<node icon="mxmlAppIcon" selected="true" label="FXG2MXMLG.mxml" url="source/FXG2MXMLG.mxml.html"/>
+			<node icon="mxmlIcon" label="Test.mxml" url="source/Test.mxml.html"/>
+		</node>
+		<node label="README" url="source/README"/>
+	</nodes>
+	<zipfile label="Download source (ZIP, 22K)" url="FXG-to-MXML-Converter.zip">
+	</zipfile>
+	<sdklink label="Download Flex SDK" url="http://www.adobe.com/go/flex4_sdk_download">
+	</sdklink>
+</index>
